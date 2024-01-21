@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using RainfallApi.Services;
 using RainfallApi.Settings;
 
@@ -9,6 +10,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient<RainfallDataService>();
 builder.Services.AddScoped<RainfallDataService>();
 
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
 builder.Services.Configure<RainfallDataSettings>(builder.Configuration.GetSection("RainfallData"));
 
 var app = builder.Build();

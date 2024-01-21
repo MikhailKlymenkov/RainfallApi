@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using RainfallApi.DTO;
 using RainfallApi.Settings;
+using System.Text.Json;
 
 namespace RainfallApi.Services;
 
@@ -15,8 +16,14 @@ public class RainfallDataService
         _rainfallApiUrl = settings.Value.RainfallApiUrl;
     }
 
-    public Task<RainfallReadingResponseDto> GetRainfallDataAsync(string stationId, int limit)
+    public async Task<RainfallReadingResponseDto> GetRainfallDataAsync(string stationId, int limit)
     {
-        return Task.FromResult(new RainfallReadingResponseDto());
+        var url = string.Format(_rainfallApiUrl, stationId, limit);
+        var response = await _httpClient.GetAsync(url);
+        response.EnsureSuccessStatusCode();
+
+        var content = await response.Content.ReadAsStringAsync();
+        var result = JsonSerializer.Deserialize<RainfallReadingResponseDto>(content);
+        return result == null ? throw new JsonException("Unsupported JSON format") : result;
     }
 }
